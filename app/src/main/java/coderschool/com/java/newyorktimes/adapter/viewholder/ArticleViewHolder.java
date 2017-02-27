@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import coderschool.com.java.newyorktimes.R;
 
+import static coderschool.com.java.newyorktimes.R.id.ivThumbnail;
+
 /**
  * Created by BuuPV on 2/25/2017.
  */
@@ -18,16 +20,26 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder {
     TextView tvAuthor;
     TextView tvTime;
     TextView tvName;
-    ImageView ivImage;
+    ImageView ivThumbnail;
 
 
     public ArticleViewHolder(View itemView) {
         super(itemView);
         tvSnippet = (TextView) itemView.findViewById(R.id.tvSnippet);
-        tvDate = (TextView) itemView.findViewById(R.id.tvDate);
-        tvAuthor = (TextView) itemView.findViewById(R.id.tvAuthor);
-        tvTime = (TextView) itemView.findViewById(R.id.tvTime);
+//        tvDate = (TextView) itemView.findViewById(R.id.tvDate);
+//        tvAuthor = (TextView) itemView.findViewById(R.id.tvAuthor);
+//        tvTime = (TextView) itemView.findViewById(R.id.tvTime);
         tvName = (TextView) itemView.findViewById(R.id.tvName);
+        ivThumbnail = (ImageView) itemView.findViewById(R.id.ivThumbnail);
+
+    }
+
+    public ImageView getIvThumbnail() {
+        return ivThumbnail;
+    }
+
+    public void setIvThumbnail(ImageView ivThumbnail) {
+        this.ivThumbnail = ivThumbnail;
     }
 
     public TextView getTvSnippet() {

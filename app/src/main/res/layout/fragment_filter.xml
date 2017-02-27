@@ -1,0 +1,47 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="filter" type="coderschool.com.java.newyorktimes.models.FilterSettings"/>
+    </data>
+    <LinearLayout
+        android:id="@+id/edit_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+
+        <Spinner
+            android:id="@+id/snSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/sort_type">
+
+        </Spinner>
+
+        <CheckBox
+            android:id="@+id/cbSport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sport" />
+
+        <CheckBox
+            android:id="@+id/cbFashion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fashion | Style" />
+
+        <CheckBox
+            android:id="@+id/cbArt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Art"
+            android:checked="@{filter.art}"/>
+
+        <Button
+            android:id="@+id/btnFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply" />
+    </LinearLayout>
+</layout>

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -13,6 +15,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
+import coderschool.com.java.newyorktimes.ProgressDialogFragment;
 import coderschool.com.java.newyorktimes.common.Constant;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -25,6 +28,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static coderschool.com.java.newyorktimes.common.Constant.API_KEY;
 
 public class BaseActivity extends AppCompatActivity {
+    protected static final String TAG_PROGRESS_DIALOG = "progressDialog";
+
     Gson gson = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd")
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -72,14 +77,39 @@ public class BaseActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
+
     public boolean isOnline() {
         Runtime runtime = Runtime.getRuntime();
         try {
             Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int     exitValue = ipProcess.waitFor();
+            int exitValue = ipProcess.waitFor();
             return (exitValue == 0);
-        } catch (IOException e)          { e.printStackTrace(); }
-        catch (InterruptedException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return false;
+    }
+
+    public void showProgressDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prevFrag = getSupportFragmentManager().findFragmentByTag(TAG_PROGRESS_DIALOG);
+        if (prevFrag == null) {
+            ProgressDialogFragment newFrag = ProgressDialogFragment.newInstance();
+            ft.add(newFrag, TAG_PROGRESS_DIALOG);
+        } else {
+            ft.remove(prevFrag);
+        }
+        ft.commitAllowingStateLoss();
+    }
+
+    public void dismissProgressDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prevFrag = getSupportFragmentManager().findFragmentByTag(TAG_PROGRESS_DIALOG);
+        if (prevFrag != null) {
+            ft.remove(prevFrag);
+        }
+        ft.commitAllowingStateLoss();
     }
 }

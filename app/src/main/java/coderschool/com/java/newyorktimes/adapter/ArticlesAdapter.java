@@ -7,6 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,7 @@ import coderschool.com.java.newyorktimes.common.Constant;
 import coderschool.com.java.newyorktimes.models.Doc;
 
 import static android.R.attr.start;
+import static coderschool.com.java.newyorktimes.common.Constant.BASE_IMAGE_URL;
 
 /**
  * Created by BuuPV on 2/24/2017.
@@ -74,13 +78,30 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void configureHotArticleViewHolder2(HotArticleViewHolder vh2, int position) {
-
+        final Doc doc = docs.get(position);
+//        vh1.getTvDate().setText(doc.getPubDate());
+//        vh2.getTvSnippet().setText(doc.getSnippet());
+//        if (doc.getMultimedia().size() == 0) return;
+        Doc.Multimedium image = doc.getMultimedia().get(doc.getMultimedia().size() - 1);
+        loadImage(vh2.getIvThumbnail(), image.getUrl(), image.getWidth(), image.getHeight());
+        vh2.getTvName().setText(doc.getHeadline().getMain());
+        vh2.getTvName().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(context, ArticleDetailActivity.class);
+                i.putExtra(Constant.ARTICLE_URL, doc.getWebUrl());
+                context.startActivity(i);
+            }
+        });
     }
 
     private void configureArticleViewHolder(ArticleViewHolder vh1, int position) {
         final Doc doc = docs.get(position);
-        vh1.getTvDate().setText(doc.getPubDate());
+//        vh1.getTvDate().setText(doc.getPubDate());
         vh1.getTvSnippet().setText(doc.getSnippet());
+        if (doc.getMultimedia().size() == 0) return;
+        Doc.Multimedium image = doc.getMultimedia().get(doc.getMultimedia().size() - 1);
+        loadImage(vh1.getIvThumbnail(), image.getUrl(), image.getWidth(), image.getHeight());
         vh1.getTvName().setText(doc.getHeadline().getMain());
         vh1.getTvName().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,7 +121,11 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        return NORMAL;
+        if (docs.get(position).getMultimedia().size() == 0) {
+            return NORMAL;
+        } else {
+            return HOT;
+        }
     }
 
     public void addAll(List<Doc> docList) {
@@ -111,6 +136,14 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void clear() {
         docs.clear();
         this.notifyDataSetChanged();
+    }
+
+    public void loadImage(ImageView view, String path, int width, int height) {
+        Glide.with(context)
+                .load(BASE_IMAGE_URL + path)
+                .override(width,height)
+                .placeholder(R.drawable.placeholder_article)
+                .into(view);
     }
 }
 

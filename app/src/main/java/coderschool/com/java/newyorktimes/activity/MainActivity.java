@@ -1,10 +1,14 @@
 package coderschool.com.java.newyorktimes.activity;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -22,8 +26,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import coderschool.com.java.newyorktimes.EndlessRecyclerViewScrollListener;
 import coderschool.com.java.newyorktimes.R;
+import coderschool.com.java.newyorktimes.VerticalSpaceItemDecoration;
+import coderschool.com.java.newyorktimes.activity.fragment.FilterFragment;
 import coderschool.com.java.newyorktimes.adapter.ArticlesAdapter;
+import coderschool.com.java.newyorktimes.models.FilterSettings;
 import coderschool.com.java.newyorktimes.network.ArticleAPIEndpoint;
 import coderschool.com.java.newyorktimes.models.Doc;
 import coderschool.com.java.newyorktimes.models.SearchResponse;
@@ -33,7 +41,7 @@ import retrofit2.Response;
 
 import static com.google.android.flexbox.FlexboxItemDecoration.BOTH;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements FilterFragment.OnFragmentInteractionListener {
     @BindView(R.id.rvArticle)
     RecyclerView rvArticle;
     @BindView(R.id.toolbar)
@@ -41,12 +49,20 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeContainer;
 
+
     ArticlesAdapter mAdapter;
-    FlexboxLayoutManager mFlexboxLayoutManager;
+//    FlexboxLayoutManager mFlexboxLayoutManager;
+    StaggeredGridLayoutManager staggeredGridLayoutManager;
     List<Doc> docList = new ArrayList<>();
     int currentPage=1;
     String searchTerm;
     boolean isLoadMore;
+    boolean isSport;
+    boolean isFashion;
+    boolean isArt;
+    FilterSettings filter;
+    EndlessRecyclerViewScrollListener mScrollListener;
+
 
     ArticleAPIEndpoint articleAPIEndpoint;
 
@@ -58,32 +74,27 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         articleAPIEndpoint = retrofit.create(ArticleAPIEndpoint.class);
 
-        mFlexboxLayoutManager = new FlexboxLayoutManager();
-        mFlexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
-        mFlexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
-        mFlexboxLayoutManager.setAlignItems(AlignItems.STRETCH);
-        rvArticle.setHasFixedSize(true);
-        rvArticle.setLayoutManager(mFlexboxLayoutManager);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+        VerticalSpaceItemDecoration dividerItemDecoration = new VerticalSpaceItemDecoration(10);
+        rvArticle.addItemDecoration(dividerItemDecoration);
+        rvArticle.setLayoutManager(staggeredGridLayoutManager);
+
+//        mFlexboxLayoutManager = new FlexboxLayoutManager();
+//        mFlexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
+//        mFlexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
+//        mFlexboxLayoutManager.setAlignItems(AlignItems.FLEX_START);
+//        rvArticle.setHasFixedSize(true);
+//        rvArticle.setLayoutManager(mFlexboxLayoutManager);
         mAdapter = new ArticlesAdapter(docList);
         rvArticle.setAdapter(mAdapter);
-
-        rvArticle.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mScrollListener = new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                fetchArticle(searchTerm,null,null,++currentPage,false);
             }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (isLoadMore)
-                    return;
-                if (dy < 0){
-                    fetchArticle(searchTerm,null,null,++currentPage,false);
-                    isLoadMore = true;
-                }
-            }
-        });
+        };
+        rvArticle.addOnScrollListener(mScrollListener);
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -100,15 +111,24 @@ public class MainActivity extends BaseActivity {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        fetchArticle(null, null, null, 0,true);
+        if (isNetworkAvailable()){
+            if (isOnline()) {
+                fetchArticle(null, null, null, 0,true);
+            } else {
+                Toast.makeText(this, "Please check your network connectivity", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Please Enable Network", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fetchArticle(String q, String begin_date, String end_date, int page, final boolean reset) {
+        showProgressDialog();
         searchTerm = q;
-        Log.d("Buu",String.valueOf(page));
         articleAPIEndpoint.getArticle(q, begin_date, end_date, page).enqueue(new Callback<SearchResponse>() {
             @Override
             public void onResponse(Call<SearchResponse> call, Response<SearchResponse> response) {
+                dismissProgressDialog();
                 swipeContainer.setRefreshing(false);
                 isLoadMore = false;
                 if (reset){
@@ -150,14 +170,29 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        if (newText.isEmpty()){
-                            fetchArticle(null,null,null,0,true);
-                        }
+
                         return false;
                     }
                 });
+                break;
+            case R.id.action_filter:
+                showFilter();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void showFilter() {
+        FragmentManager fm = getSupportFragmentManager();
+        filter = new FilterSettings();
+        filter.setArt(true);
+        FilterFragment filterFragment = FilterFragment.newInstance(filter);
+        filterFragment.show(fm, "fragment_edit_name");
+    }
+
+
+    @Override
+    public void onFragmentInteraction(FilterSettings filter) {
+        this.filter = filter;
+    }
 }

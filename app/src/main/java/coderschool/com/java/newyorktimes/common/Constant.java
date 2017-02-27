@@ -6,7 +6,8 @@ package coderschool.com.java.newyorktimes.common;
 
 public class Constant {
     public final static String BASE_URL = "https://api.nytimes.com/svc/search/v2/";
-    public final static String API_KEY = "3c1a54fec0804d5cb463fc394c80377b";
+    public final static String BASE_IMAGE_URL = "http://www.nytimes.com/";
 
+    public final static String API_KEY = "3c1a54fec0804d5cb463fc394c80377b";
     public static String ARTICLE_URL = "article_url";
 }
