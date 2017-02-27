@@ -1,4 +1,4 @@
-package coderschool.com.java.newyorktimes;
+package coderschool.com.java.newyorktimes.activity.fragment;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+
+import coderschool.com.java.newyorktimes.R;
 
 /**
  * Created by BuuPV on 2/24/2017.

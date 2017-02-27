@@ -19,10 +19,6 @@ public class HotArticleViewHolder extends RecyclerView.ViewHolder{
 
     public HotArticleViewHolder(View itemView) {
         super(itemView);
-//        tvSnippet = (TextView) itemView.findViewById(tvSnippet);
-//        tvDate = (TextView) itemView.findViewById(R.id.tvDate);
-//        tvAuthor = (TextView) itemView.findViewById(R.id.tvAuthor);
-//        tvTime = (TextView) itemView.findViewById(R.id.tvTime);
         tvName = (TextView) itemView.findViewById(R.id.tvName);
         ivThumbnail = (ImageView) itemView.findViewById(R.id.ivThumbnail);
 

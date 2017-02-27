@@ -58,6 +58,8 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 view = inflater.inflate(R.layout.hot_article, parent, false);
                 viewHolder = new HotArticleViewHolder(view);
                 break;
+
+
         }
         return viewHolder;
     }
@@ -79,9 +81,6 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void configureHotArticleViewHolder2(HotArticleViewHolder vh2, int position) {
         final Doc doc = docs.get(position);
-//        vh1.getTvDate().setText(doc.getPubDate());
-//        vh2.getTvSnippet().setText(doc.getSnippet());
-//        if (doc.getMultimedia().size() == 0) return;
         Doc.Multimedium image = doc.getMultimedia().get(doc.getMultimedia().size() - 1);
         loadImage(vh2.getIvThumbnail(), image.getUrl(), image.getWidth(), image.getHeight());
         vh2.getTvName().setText(doc.getHeadline().getMain());
@@ -97,11 +96,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void configureArticleViewHolder(ArticleViewHolder vh1, int position) {
         final Doc doc = docs.get(position);
-//        vh1.getTvDate().setText(doc.getPubDate());
         vh1.getTvSnippet().setText(doc.getSnippet());
-        if (doc.getMultimedia().size() == 0) return;
-        Doc.Multimedium image = doc.getMultimedia().get(doc.getMultimedia().size() - 1);
-        loadImage(vh1.getIvThumbnail(), image.getUrl(), image.getWidth(), image.getHeight());
         vh1.getTvName().setText(doc.getHeadline().getMain());
         vh1.getTvName().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +136,6 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void loadImage(ImageView view, String path, int width, int height) {
         Glide.with(context)
                 .load(BASE_IMAGE_URL + path)
-                .override(width,height)
                 .placeholder(R.drawable.placeholder_article)
                 .into(view);
     }
