@@ -17,8 +17,11 @@ import lombok.Data;
 public class FilterSettings{
 //    Date beginDate;
     int sortType;
-    List<String> newsDesk;
     boolean isArt;
+    boolean isFashion;
+    boolean isSport;
+
+
 
     public FilterSettings() {
     }
@@ -31,12 +34,20 @@ public class FilterSettings{
         this.sortType = sortType;
     }
 
-    public List<String> getNewsDesk() {
-        return newsDesk;
+    public boolean isFashion() {
+        return isFashion;
     }
 
-    public void setNewsDesk(List<String> newsDesk) {
-        this.newsDesk = newsDesk;
+    public void setFashion(boolean fashion) {
+        isFashion = fashion;
+    }
+
+    public boolean isSport() {
+        return isSport;
+    }
+
+    public void setSport(boolean sport) {
+        isSport = sport;
     }
 
     public boolean isArt() {

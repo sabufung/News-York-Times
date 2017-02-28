@@ -30,13 +30,15 @@
             android:id="@+id/cbSport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sport" />
+            android:text="Sport"
+            android:checked="@{filter.sport}"/>
 
         <CheckBox
             android:id="@+id/cbFashion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fashion | Style" />
+            android:text="Fashion | Style"
+            android:checked="@{filter.fashion}"/>
 
         <CheckBox
             android:id="@+id/cbArt"

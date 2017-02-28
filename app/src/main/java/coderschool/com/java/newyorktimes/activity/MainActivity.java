@@ -51,15 +51,12 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
 
 
     ArticlesAdapter mAdapter;
-//    FlexboxLayoutManager mFlexboxLayoutManager;
+    //    FlexboxLayoutManager mFlexboxLayoutManager;
     StaggeredGridLayoutManager staggeredGridLayoutManager;
     List<Doc> docList = new ArrayList<>();
-    int currentPage=1;
+    int currentPage = 1;
     String searchTerm;
     boolean isLoadMore;
-    boolean isSport;
-    boolean isFashion;
-    boolean isArt;
     FilterSettings filter;
     EndlessRecyclerViewScrollListener mScrollListener;
 
@@ -74,7 +71,7 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
         setSupportActionBar(toolbar);
         articleAPIEndpoint = retrofit.create(ArticleAPIEndpoint.class);
 
-        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         VerticalSpaceItemDecoration dividerItemDecoration = new VerticalSpaceItemDecoration(10);
         rvArticle.addItemDecoration(dividerItemDecoration);
@@ -91,7 +88,7 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
         mScrollListener = new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                fetchArticle(searchTerm,null,null,++currentPage,false);
+                fetchArticle(searchTerm, null, null, ++currentPage, false);
             }
         };
         rvArticle.addOnScrollListener(mScrollListener);
@@ -100,10 +97,9 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
             @Override
             public void onRefresh() {
                 currentPage = 1;
-                fetchArticle(searchTerm,null,null,0,true);
+                fetchArticle(searchTerm, null, null, 0, true);
             }
         });
-
 
 
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -111,9 +107,9 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        if (isNetworkAvailable()){
+        if (isNetworkAvailable()) {
             if (isOnline()) {
-                fetchArticle(null, null, null, 0,true);
+                fetchArticle(null, null, null, 0, true);
             } else {
                 Toast.makeText(this, "Please check your network connectivity", Toast.LENGTH_SHORT).show();
             }
@@ -125,13 +121,21 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
     private void fetchArticle(String q, String begin_date, String end_date, int page, final boolean reset) {
         showProgressDialog();
         searchTerm = q;
-        articleAPIEndpoint.getArticle(q, begin_date, end_date, page).enqueue(new Callback<SearchResponse>() {
+        String newsDesk = "news_desk";
+        if (filter.isArt() || filter.isFashion() || filter.isSport()) {
+            newsDesk += "(";
+            if (filter.isArt()) newsDesk += "'Art',";
+            if (filter.isSport()) newsDesk += "'Sport',";
+            if (filter.isFashion()) newsDesk += "'Fashion'";
+            newsDesk += ")";
+        }
+        articleAPIEndpoint.getArticle(q, begin_date, newsDesk, page).enqueue(new Callback<SearchResponse>() {
             @Override
             public void onResponse(Call<SearchResponse> call, Response<SearchResponse> response) {
                 dismissProgressDialog();
                 swipeContainer.setRefreshing(false);
                 isLoadMore = false;
-                if (reset){
+                if (reset) {
                     mAdapter.clear();
                 }
                 mAdapter.addAll(response.body().getResponse().getDocs());
@@ -160,11 +164,11 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         searchView.clearFocus();
-                        if (query.isEmpty()){
-                            fetchArticle(null,null,null,0,true);
+                        if (query.isEmpty()) {
+                            fetchArticle(null, null, null, 0, true);
                             return true;
                         }
-                        fetchArticle(query,null,null,0,true);
+                        fetchArticle(query, null, null, 0, true);
                         return true;
                     }
 
@@ -183,11 +187,12 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
     }
 
     private void showFilter() {
+        if (filter == null) {
+            filter = new FilterSettings();
+        }
         FragmentManager fm = getSupportFragmentManager();
-        filter = new FilterSettings();
-        filter.setArt(true);
         FilterFragment filterFragment = FilterFragment.newInstance(filter);
-        filterFragment.show(fm, "fragment_edit_name");
+        filterFragment.show(fm, "fragment_filter");
     }
 
 

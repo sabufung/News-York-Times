@@ -12,5 +12,5 @@ import retrofit2.http.Query;
 public interface ArticleAPIEndpoint {
 
     @GET("articlesearch.json")
-    Call<SearchResponse> getArticle(@Query("q") String q, @Query("begin_date") String begin_date, @Query("end_date") String end_date, @Query("page") int page);
+    Call<SearchResponse> getArticle(@Query("q") String q, @Query("begin_date") String begin_date, @Query("fq") String fq, @Query("page") int page);
 }
