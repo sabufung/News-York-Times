@@ -121,15 +121,8 @@ public class MainActivity extends BaseActivity implements FilterFragment.OnFragm
     private void fetchArticle(String q, String begin_date, String end_date, int page, final boolean reset) {
         showProgressDialog();
         searchTerm = q;
-        String newsDesk = "news_desk";
-        if (filter.isArt() || filter.isFashion() || filter.isSport()) {
-            newsDesk += "(";
-            if (filter.isArt()) newsDesk += "'Art',";
-            if (filter.isSport()) newsDesk += "'Sport',";
-            if (filter.isFashion()) newsDesk += "'Fashion'";
-            newsDesk += ")";
-        }
-        articleAPIEndpoint.getArticle(q, begin_date, newsDesk, page).enqueue(new Callback<SearchResponse>() {
+
+        articleAPIEndpoint.getArticle(q, begin_date, end_date, page).enqueue(new Callback<SearchResponse>() {
             @Override
             public void onResponse(Call<SearchResponse> call, Response<SearchResponse> response) {
                 dismissProgressDialog();
